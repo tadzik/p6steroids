@@ -182,18 +182,18 @@ class Spaceship does Drawable {
             $!vel += 0.04
         }
 
-        $!x1 = Int(cos(rad($!rot))             * $!size    );
-        $!y1 = Int(sin(rad($!rot))             * $!size    );
-        $!x2 = Int(cos(rad($!rot + 120 % 360)) * $!size / 2);
-        $!y2 = Int(sin(rad($!rot + 120 % 360)) * $!size / 2);
-        $!x3 = Int(cos(rad($!rot + 240 % 360)) * $!size / 2);
-        $!y3 = Int(sin(rad($!rot + 240 % 360)) * $!size / 2);
+        $!x1 = $!x + Int(cos(rad($!rot))             * $!size    );
+        $!y1 = $!y + Int(sin(rad($!rot))             * $!size    );
+        $!x2 = $!x + Int(cos(rad($!rot + 120 % 360)) * $!size / 2);
+        $!y2 = $!y + Int(sin(rad($!rot + 120 % 360)) * $!size / 2);
+        $!x3 = $!x + Int(cos(rad($!rot + 240 % 360)) * $!size / 2);
+        $!y3 = $!y + Int(sin(rad($!rot + 240 % 360)) * $!size / 2);
     }
 
     method draw(Game $g) {
-        $g.draw_triangle($!x + $!x1, $!y + $!y1,
-                         $!x + $!x2, $!y + $!y2,
-                         $!x + $!x3, $!y + $!y3,
+        $g.draw_triangle($!x1, $!y1,
+                         $!x2, $!y2,
+                         $!x3, $!y3,
                          255, 255, 255, 255)
     }
 
@@ -207,11 +207,8 @@ class Spaceship does Drawable {
         )
     }
 
-    # broken? XXX WTF
     method hits_asteroid(Asteroid $a) {
-        so any($a.is_inside($!x1, $!y1),
-               $a.is_inside($!x2, $!y2),
-               $a.is_inside($!x3, $!y3))
+        so any ($a.is_inside($!x1, $!y1), $a.is_inside($!x2, $!y2), $a.is_inside($!x3, $!y3))
     }
 }
 
@@ -273,6 +270,7 @@ while !$lost and $game.is_running {
     if $game.is_pressed(SDLK_RIGHT) {
         $player.rot += 10
     }
+    $player.rot %= 360;
     $player.move;
     @asteroids».move;
     for @asteroids -> $a {
@@ -282,7 +280,6 @@ while !$lost and $game.is_running {
             last;
         }
     }
-    $player.rot %= 360;
     $game.draw($player, @projectiles, @asteroids);
 
     $iters++;
